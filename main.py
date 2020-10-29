@@ -37,21 +37,15 @@ for webpage in df['WebPage']:
 		time.sleep(2)
 
 		#find all links on page
-		elems = WebDriverWait(driver, 20).until(EC.presence_of_all_elements_located((By.TAG_NAME, 'a')))
+		elems = WebDriverWait(driver, 30).until(EC.presence_of_all_elements_located((By.XPATH, '//*[@id="result"]//*[contains(@type,"button")]')))
 
 		time.sleep(2)
 
 		#loop through links to fins actual results and add to results variable
 		for elem in elems:
-		    href = elem.get_attribute('href')
-		    if href != "https://redirectdetective.com/about.html" and href != "https://redirectdetective.com/faq.html" and href != "https://redirectdetective.com/index.html" and href != "https://redirectdetective.com/redirect-resources.html" and href != "https://redirectdetective.com/changes.html" and href != "https://redirectdetective.com/#":
-		    	webpage_str += href + ", "  	
-
-		#raise error if result is empty
-		if webpage_str == "":
-			raise ValueError
-		else:
-			pass
+			#print(elem.text)
+			txt = elem.text
+			webpage_str += txt + ", "	
 
 		#add results to dataframe
 		data = [[webpage, webpage_str]]
@@ -69,6 +63,9 @@ for webpage in df['WebPage']:
 		print("There was an error for the website: " + webpage)
 		#adds error to error log list
 		errorLog.append(webpage + "\n")
+		data2 = [[webpage, "There was an error"]]
+		df3 = pd.DataFrame(data2, columns = ['WebPage', 'Redirect'])
+		df = df.append(df3, ignore_index=False)
 		#refresh page
 		driver.refresh()
 		#restart loop
